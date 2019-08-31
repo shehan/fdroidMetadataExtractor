@@ -29,37 +29,43 @@ def remove_readonly(func, path, excinfo):
 
 if args.arg_overwrite:
     if os.path.exists(fdroid_repo_local):
-        print('removing fdroid directory')
+        print('removing fdroid directory...', end ='', flush=True)
         shutil.rmtree(fdroid_repo_local, onerror=remove_readonly)
+        print('done')
     if os.path.exists(results_output):
-        print('removing output directory')
+        print('removing output directory...', end ='', flush=True)
         shutil.rmtree(results_output,  onerror=remove_readonly)
+        print('done')
 
 
 if not os.path.exists(fdroid_repo_local):
-    print('creating fdroid directory')
+    print('creating fdroid directory...', end ='', flush=True)
     os.makedirs(fdroid_repo_local)
+    print('done')
 
 if not os.path.exists(results_output):
-    print('creating output directory')
+    print('creating output directory...', end ='', flush=True)
     os.makedirs(results_output)
+    print('done')
 
 if not os.path.exists(results_output_db_path):
-    print('creating empty database')
+    print('creating empty database...', end ='', flush=True)
     conn = sqlite3.connect(results_output_db_path)
     c = conn.cursor()
     c.execute('''CREATE TABLE App
         ([Id] INTEGER PRIMARY KEY AUTOINCREMENT,[UniqueName] text,[Name] text,[AutoName] text,[WebSite] text,[AuthorName] text,[AuthorEmail] text,[Categories] text,[Repo] text,[SourceCode] text,[RepoType] text,[Changelog] text,[License] text,[IssueTracker] text,[Description] text)''')
     conn.commit()
     conn.close()
+    print('done')
 
 try:
     repo = git.Repo(fdroid_repo_local, search_parent_directories=False)
 except git.exc.InvalidGitRepositoryError:
-    print('cloning fdroid repo')
+    print('cloning fdroid repo...', end ='', flush=True)
     repo = Repo.clone_from(fdroid_repo_remote, fdroid_repo_local)
+    print('done')
 
-print('extracting metadata')
+print('extracting metadata...', end ='', flush=True)
 conn = sqlite3.connect(results_output_db_path)
 c = conn.cursor()
 os.chdir(fdroid_repo_local_metadata)
@@ -106,5 +112,6 @@ for file in glob.glob("*.yml"):
             e = sys.exc_info()[0]
             print(e)
 conn.close()
+print('done')
 
 print('execution completed!')
